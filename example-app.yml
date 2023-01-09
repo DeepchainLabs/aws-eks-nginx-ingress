@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ct-2
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chatbot-server
+  namespace: ct-2
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: chatbot-server
+  template:
+    metadata:
+      labels:
+        app: chatbot-server
+    spec:
+      containers:
+        - name: ct
+          image:  shihab24/testapp:latest
+          # env:
+          #   - name: TZ
+          #     value: Asia/Dhaka
+          ports:
+          - containerPort: 3000
+          # imagePullPolicy: Always
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatbot-server
+  namespace: ct-2
+spec:
+  type: NodePort
+  selector:
+    app: chatbot-server
+  ports:
+    - port: 80
+      targetPort: 3000
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatbot-server-ingress
+  namespace: ct-2
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: ct.nftvast.com
+    http:
+      paths:
+        - pathType: Prefix
+          backend:
+            service:
+              name: chatbot-server
+              port:
+                number: 80
+          path: /
