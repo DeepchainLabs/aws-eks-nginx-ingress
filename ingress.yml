@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatbot-server-ingress
+  namespace: ct-2
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: ct.nftvast.com
+    http:
+      paths:
+        - pathType: Prefix
+          backend:
+            service:
+              name: chatbot-server
+              port:
+                number: 80
+          path: /
